@@ -1,0 +1,16 @@
+# Hasil build Maven
+target/
+
+# File pribadi NetBeans / IDE
+nbproject/private/
+nb-configuration.xml
+nbactions.xml
+.idea/
+.vscode/
+*.iml
+
+# Lain-lain
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
