@@ -3,7 +3,7 @@ package com.iurin.controller;
 import com.iurin.model.AdminDao;
 import com.iurin.model.Admin;
 import java.io.IOException;
-import java.sql.SQLException;
+import org.hibernate.HibernateException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +44,7 @@ public class LoginServlet extends BaseServlet {
             }
             req.getSession(true).setAttribute("admin", admin);
             redirect(req, resp, "/anggota");
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
             throw new ServletException("Gagal terhubung ke database: " + e.getMessage(), e);
         }
     }

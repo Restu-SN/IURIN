@@ -6,7 +6,7 @@ import com.iurin.model.Pembayaran;
 import com.iurin.util.Format;
 import com.iurin.util.ValidasiException;
 import java.io.IOException;
-import java.sql.SQLException;
+import org.hibernate.HibernateException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import javax.servlet.ServletException;
@@ -25,7 +25,7 @@ public class PembayaranServlet extends BaseServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             tampilForm(req, resp, null);
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
             throw new ServletException(e);
         }
     }
@@ -59,13 +59,13 @@ public class PembayaranServlet extends BaseServlet {
                 req.setAttribute("error", e instanceof DateTimeParseException ? "Tanggal bayar tidak valid." : e.getMessage());
                 tampilForm(req, resp, p);
             }
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
             throw new ServletException(e);
         }
     }
 
     private void tampilForm(HttpServletRequest req, HttpServletResponse resp, Pembayaran input)
-            throws SQLException, ServletException, IOException {
+            throws ServletException, IOException {
         String minggu = param(req, "minggu");
         if (!Format.mingguValid(minggu)) {
             minggu = Format.mingguIni();

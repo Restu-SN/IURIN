@@ -1,72 +1,52 @@
 package com.iurin.model;
 
 import com.iurin.util.Format;
-import com.iurin.util.Koneksi;
+import com.iurin.util.HibernateUtil;
 import com.iurin.util.ValidasiException;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PembayaranDao {
 
     /** Riwayat pembayaran; minggu null/kosong = semua minggu. */
-    public List<Pembayaran> daftar(String minggu) throws SQLException {
+    public List<Pembayaran> daftar(String minggu) {
         boolean filter = minggu != null && !minggu.isEmpty();
-        String sql = "SELECT p.*, a.nama FROM pembayaran p JOIN anggota a ON a.id = p.anggota_id"
-                + (filter ? " WHERE p.minggu = ?" : "")
-                + " ORDER BY p.tanggal_bayar DESC, p.id DESC";
-        try (Connection c = Koneksi.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+        String hql = "from Pembayaran p join fetch p.anggota"
+                + (filter ? " where p.minggu = :minggu" : "")
+                + " order by p.tanggalBayar desc, p.id desc";
+        return HibernateUtil.baca(s -> {
+            var q = s.createQuery(hql, Pembayaran.class);
             if (filter) {
-                ps.setString(1, minggu);
+                q.setParameter("minggu", minggu);
             }
-            List<Pembayaran> hasil = new ArrayList<>();
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Pembayaran p = dariRow(rs);
-                    p.setNamaAnggota(rs.getString("nama"));
-                    hasil.add(p);
-                }
-            }
-            return hasil;
-        }
+            return q.getResultList();
+        });
     }
 
-    public void tambah(Pembayaran p) throws SQLException, ValidasiException {
-        try (Connection c = Koneksi.getConnection()) {
-            try (PreparedStatement cek = c.prepareStatement(
-                    "SELECT COUNT(*) FROM pembayaran WHERE anggota_id = ? AND minggu = ?")) {
-                cek.setInt(1, p.getAnggotaId());
-                cek.setString(2, p.getMinggu());
-                try (ResultSet rs = cek.executeQuery()) {
-                    rs.next();
-                    if (rs.getInt(1) > 0) {
-                        throw new ValidasiException("Anggota ini sudah membayar iuran "
-                                + Format.namaMinggu(p.getMinggu()) + ".");
-                    }
-                }
-            }
-            String sql = "INSERT INTO pembayaran (anggota_id, minggu, jumlah, tanggal_bayar, keterangan) VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement ps = c.prepareStatement(sql)) {
-                ps.setInt(1, p.getAnggotaId());
-                ps.setString(2, p.getMinggu());
-                ps.setInt(3, p.getJumlah());
-                ps.setDate(4, Date.valueOf(p.getTanggalBayar()));
-                ps.setString(5, p.getKeterangan());
-                ps.executeUpdate();
-            }
+    public void tambah(Pembayaran p) throws ValidasiException {
+        long sudahAda = HibernateUtil.baca(s -> s
+                .createQuery("select count(p) from Pembayaran p where p.anggota.id = :id and p.minggu = :minggu", Long.class)
+                .setParameter("id", p.getAnggotaId())
+                .setParameter("minggu", p.getMinggu())
+                .getSingleResult());
+        if (sudahAda > 0) {
+            throw new ValidasiException("Anggota ini sudah membayar iuran " + Format.namaMinggu(p.getMinggu()) + ".");
         }
+        HibernateUtil.tulis(s -> {
+            p.setAnggota(s.getReference(Anggota.class, p.getAnggotaId()));
+            s.persist(p);
+        });
     }
 
-    public void hapus(int id) throws SQLException {
-        try (Connection c = Koneksi.getConnection();
-                PreparedStatement ps = c.prepareStatement("DELETE FROM pembayaran WHERE id = ?")) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        }
+    public void hapus(int id) {
+        HibernateUtil.tulis(s -> {
+            Pembayaran p = s.get(Pembayaran.class, id);
+            if (p != null) {
+                s.remove(p);
+            }
+        });
     }
 
     /**
@@ -74,40 +54,21 @@ public class PembayaranDao {
      * Lunas = ada pembayaran; Menunggak = belum bayar dan minggunya sudah lewat;
      * Belum Bayar = belum bayar untuk minggu berjalan / mendatang.
      */
-    public List<StatusIuran> statusMinggu(String minggu) throws SQLException {
-        String sql = "SELECT a.*, p.id AS p_id, p.anggota_id, p.minggu, p.jumlah, p.tanggal_bayar, p.keterangan"
-                + " FROM anggota a LEFT JOIN pembayaran p ON p.anggota_id = a.id AND p.minggu = ?"
-                + " ORDER BY a.nama";
+    public List<StatusIuran> statusMinggu(String minggu) {
+        List<Anggota> anggota = new AnggotaDao().semua();
+        Map<Integer, Pembayaran> bayar = new HashMap<>();
+        for (Pembayaran p : daftar(minggu)) {
+            bayar.put(p.getAnggotaId(), p);
+        }
         // Format YYYY-Www bisa dibandingkan langsung sebagai teks
         boolean sudahLewat = minggu.compareTo(Format.mingguIni()) < 0;
-        try (Connection c = Koneksi.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, minggu);
-            List<StatusIuran> hasil = new ArrayList<>();
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Anggota a = AnggotaDao.dariRow(rs);
-                    if (rs.getObject("p_id") != null) {
-                        Pembayaran p = dariRow(rs);
-                        p.setId(rs.getInt("p_id"));
-                        hasil.add(new StatusIuran(a, StatusIuran.Status.LUNAS, p));
-                    } else {
-                        hasil.add(new StatusIuran(a, sudahLewat
-                                ? StatusIuran.Status.MENUNGGAK : StatusIuran.Status.BELUM_BAYAR, null));
-                    }
-                }
-            }
-            return hasil;
+        List<StatusIuran> hasil = new ArrayList<>();
+        for (Anggota a : anggota) {
+            Pembayaran p = bayar.get(a.getId());
+            StatusIuran.Status status = p != null ? StatusIuran.Status.LUNAS
+                    : sudahLewat ? StatusIuran.Status.MENUNGGAK : StatusIuran.Status.BELUM_BAYAR;
+            hasil.add(new StatusIuran(a, status, p));
         }
-    }
-
-    private static Pembayaran dariRow(ResultSet rs) throws SQLException {
-        Pembayaran p = new Pembayaran();
-        p.setId(rs.getInt("id"));
-        p.setAnggotaId(rs.getInt("anggota_id"));
-        p.setMinggu(rs.getString("minggu"));
-        p.setJumlah(rs.getInt("jumlah"));
-        p.setTanggalBayar(rs.getDate("tanggal_bayar").toLocalDate());
-        p.setKeterangan(rs.getString("keterangan"));
-        return p;
+        return hasil;
     }
 }

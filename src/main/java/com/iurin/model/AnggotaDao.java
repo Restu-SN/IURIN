@@ -1,98 +1,57 @@
 package com.iurin.model;
 
-import com.iurin.util.Koneksi;
+import com.iurin.util.HibernateUtil;
 import com.iurin.util.ValidasiException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AnggotaDao {
 
     /** Daftar anggota; keyword (boleh kosong) dicocokkan ke nama. */
-    public List<Anggota> cari(String keyword) throws SQLException {
-        String sql = "SELECT * FROM anggota WHERE nama LIKE ? ORDER BY nama";
-        try (Connection c = Koneksi.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, "%" + (keyword == null ? "" : keyword.trim()) + "%");
-            return baca(ps);
-        }
+    public List<Anggota> cari(String keyword) {
+        String pola = "%" + (keyword == null ? "" : keyword.trim()) + "%";
+        return HibernateUtil.baca(s -> s
+                .createQuery("from Anggota where nama like :pola order by nama", Anggota.class)
+                .setParameter("pola", pola)
+                .getResultList());
     }
 
-    public List<Anggota> semua() throws SQLException {
+    public List<Anggota> semua() {
         return cari("");
     }
 
-    public Anggota cariId(int id) throws SQLException {
-        String sql = "SELECT * FROM anggota WHERE id = ?";
-        try (Connection c = Koneksi.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            List<Anggota> hasil = baca(ps);
-            return hasil.isEmpty() ? null : hasil.get(0);
-        }
+    public Anggota cariId(int id) {
+        return HibernateUtil.baca(s -> s.get(Anggota.class, id));
     }
 
-    public void tambah(Anggota a) throws SQLException, ValidasiException {
+    public void tambah(Anggota a) throws ValidasiException {
         cekNama(a.getNama(), 0);
-        String sql = "INSERT INTO anggota (nama, nominal_iuran) VALUES (?, ?)";
-        try (Connection c = Koneksi.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, a.getNama());
-            ps.setInt(2, a.getNominalIuran());
-            ps.executeUpdate();
-        }
+        HibernateUtil.tulis(s -> s.persist(a));
     }
 
     /** Hanya mengubah data anggota; riwayat pembayaran tidak disentuh. */
-    public void ubah(Anggota a) throws SQLException, ValidasiException {
+    public void ubah(Anggota a) throws ValidasiException {
         cekNama(a.getNama(), a.getId());
-        String sql = "UPDATE anggota SET nama = ?, nominal_iuran = ? WHERE id = ?";
-        try (Connection c = Koneksi.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, a.getNama());
-            ps.setInt(2, a.getNominalIuran());
-            ps.setInt(3, a.getId());
-            ps.executeUpdate();
-        }
+        HibernateUtil.tulis(s -> s.merge(a));
     }
 
-    /** Riwayat iuran ikut terhapus lewat ON DELETE CASCADE. */
-    public void hapus(int id) throws SQLException {
-        try (Connection c = Koneksi.getConnection();
-                PreparedStatement ps = c.prepareStatement("DELETE FROM anggota WHERE id = ?")) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        }
-    }
-
-    private void cekNama(String nama, int kecualiId) throws SQLException, ValidasiException {
-        String sql = "SELECT COUNT(*) FROM anggota WHERE nama = ? AND id <> ?";
-        try (Connection c = Koneksi.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, nama);
-            ps.setInt(2, kecualiId);
-            try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                if (rs.getInt(1) > 0) {
-                    throw new ValidasiException("Anggota bernama " + nama + " sudah ada.");
-                }
+    /** Riwayat iuran ikut terhapus lewat ON DELETE CASCADE di database. */
+    public void hapus(int id) {
+        HibernateUtil.tulis(s -> {
+            Anggota a = s.get(Anggota.class, id);
+            if (a != null) {
+                s.remove(a);
             }
-        }
+        });
     }
 
-    private List<Anggota> baca(PreparedStatement ps) throws SQLException {
-        List<Anggota> hasil = new ArrayList<>();
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                hasil.add(dariRow(rs));
-            }
+    private void cekNama(String nama, int kecualiId) throws ValidasiException {
+        long jumlah = HibernateUtil.baca(s -> s
+                .createQuery("select count(a) from Anggota a where a.nama = :nama and a.id <> :id", Long.class)
+                .setParameter("nama", nama)
+                .setParameter("id", kecualiId)
+                .getSingleResult());
+        if (jumlah > 0) {
+            throw new ValidasiException("Anggota bernama " + nama + " sudah ada.");
         }
-        return hasil;
-    }
-
-    static Anggota dariRow(ResultSet rs) throws SQLException {
-        Anggota a = new Anggota();
-        a.setId(rs.getInt("id"));
-        a.setNama(rs.getString("nama"));
-        a.setNominalIuran(rs.getInt("nominal_iuran"));
-        return a;
     }
 }

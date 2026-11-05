@@ -3,7 +3,7 @@
 Aplikasi web untuk mencatat iuran mingguan anggota klub badminton **PB Orang Pusing**:
 siapa yang sudah bayar, siapa yang belum/menunggak, dan rekap kas klub.
 
-Dibuat dengan **Java (JSP + Servlet)**, **Maven**, **MySQL**, dan **Bootstrap 5**, dijalankan di **Apache Tomcat** melalui **NetBeans**.
+Dibuat dengan **Java (JSP + Servlet)**, **Hibernate (ORM)**, **Maven**, **MySQL**, dan **Bootstrap 5**, dijalankan di **Apache Tomcat** melalui **NetBeans**.
 
 ## Fitur
 
@@ -23,13 +23,13 @@ iurin/
 ├── pom.xml                        ← konfigurasi Maven
 └── src/main/
     ├── java/com/iurin/
-    │   ├── model/                 ← MODEL: data & akses database
+    │   ├── model/                 ← MODEL: entity Hibernate & DAO (HQL)
     │   │   ├── Anggota.java, Pembayaran.java, Pengeluaran.java, ...
     │   │   └── AnggotaDao.java, PembayaranDao.java, KasDao.java, AdminDao.java
     │   ├── controller/            ← CONTROLLER: Servlet yang menerima request
     │   │   └── AnggotaServlet.java, PembayaranServlet.java, StatusServlet.java, ...
-    │   └── util/                  ← koneksi database, hash password, format rupiah
-    ├── resources/db.properties    ← pengaturan koneksi MySQL
+    │   └── util/                  ← HibernateUtil, hash password, format rupiah
+    ├── resources/hibernate.cfg.xml ← konfigurasi Hibernate & koneksi MySQL
     └── webapp/
         ├── WEB-INF/views/         ← VIEW: halaman JSP
         ├── WEB-INF/web.xml        ← nama klub & konfigurasi aplikasi
@@ -46,4 +46,4 @@ iurin/
 5. Buka `http://localhost:8080/iurin` dan login dengan username `admin`, password `admin123`
    (segera ganti lewat menu **Ganti password**).
 
-Jika MySQL memakai password, ubah `db.password` di `src/main/resources/db.properties`.
+Jika MySQL memakai password, ubah `hibernate.connection.password` di `src/main/resources/hibernate.cfg.xml`.

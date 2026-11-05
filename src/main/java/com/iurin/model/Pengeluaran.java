@@ -1,13 +1,31 @@
 package com.iurin.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "pengeluaran")
 public class Pengeluaran {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "tanggal", nullable = false)
     private LocalDate tanggal;
+
+    @Column(name = "kategori", nullable = false, length = 50)
     private String kategori;
+
+    @Column(name = "keterangan")
     private String keterangan;
+
+    @Column(name = "jumlah", nullable = false)
     private int jumlah;
 
     public int getId() { return id; }

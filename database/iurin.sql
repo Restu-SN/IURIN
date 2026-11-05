@@ -4,7 +4,6 @@
 CREATE DATABASE IF NOT EXISTS iurin CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE iurin;
 
--- Admin / bendahara. Password disimpan sebagai hash PBKDF2 (iterasi:salt:hash).
 CREATE TABLE admin (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     username      VARCHAR(50)  NOT NULL UNIQUE,
@@ -18,8 +17,6 @@ CREATE TABLE anggota (
     nominal_iuran INT          NOT NULL DEFAULT 0
 );
 
--- minggu berformat ISO YYYY-Www (mis. 2026-W45). UNIQUE(anggota_id, minggu) mencegah pembayaran ganda.
--- ON DELETE CASCADE: riwayat iuran ikut terhapus saat anggota dihapus.
 CREATE TABLE pembayaran (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     anggota_id    INT         NOT NULL,
@@ -40,11 +37,9 @@ CREATE TABLE pengeluaran (
     jumlah     INT          NOT NULL
 );
 
--- Akun awal: username admin, password admin123 (segera ganti setelah login pertama)
 INSERT INTO admin (username, password_hash, nama) VALUES
 ('admin', '65536:glcm/l74HPil3fYt+H3Oqg==:2AbNTdXvB8iBxUNETwzg6xgAH0M5m7yO450cdg/FJA4=', 'Bendahara Klub');
 
--- Anggota PB Orang Pusing (iuran Rp 15.000 / minggu)
 INSERT INTO anggota (nama, nominal_iuran) VALUES
 ('Etuuu',      15000),
 ('Mas Moko',   15000),

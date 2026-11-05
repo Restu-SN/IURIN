@@ -3,7 +3,7 @@ package com.iurin.controller;
 import com.iurin.model.KasDao;
 import com.iurin.model.Pengeluaran;
 import java.io.IOException;
-import java.sql.SQLException;
+import org.hibernate.HibernateException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import javax.servlet.ServletException;
@@ -35,7 +35,7 @@ public class KasServlet extends BaseServlet {
             req.setAttribute("daftarPengeluaran", kasDao.daftarPengeluaran(bulan));
             req.setAttribute("hariIni", LocalDate.now());
             tampil(req, resp, "kas", "kas");
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
             throw new ServletException(e);
         }
     }
@@ -65,7 +65,7 @@ public class KasServlet extends BaseServlet {
                 }
             }
             redirect(req, resp, kembali);
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
             throw new ServletException(e);
         }
     }

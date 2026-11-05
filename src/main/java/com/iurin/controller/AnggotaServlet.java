@@ -7,7 +7,7 @@ import com.iurin.model.StatusIuran;
 import com.iurin.util.Format;
 import com.iurin.util.ValidasiException;
 import java.io.IOException;
-import java.sql.SQLException;
+import org.hibernate.HibernateException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -49,7 +49,7 @@ public class AnggotaServlet extends BaseServlet {
             req.setAttribute("status", status);
             req.setAttribute("namaMinggu", Format.namaMinggu(minggu));
             tampil(req, resp, "anggota-list", "anggota");
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
             throw new ServletException(e);
         }
     }
@@ -85,7 +85,7 @@ public class AnggotaServlet extends BaseServlet {
                 req.setAttribute("anggota", a);
                 tampil(req, resp, "anggota-form", "anggota");
             }
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
             throw new ServletException(e);
         }
     }

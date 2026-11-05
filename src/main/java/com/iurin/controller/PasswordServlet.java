@@ -3,7 +3,7 @@ package com.iurin.controller;
 import com.iurin.model.AdminDao;
 import com.iurin.model.Admin;
 import java.io.IOException;
-import java.sql.SQLException;
+import org.hibernate.HibernateException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +36,7 @@ public class PasswordServlet extends BaseServlet {
                 return;
             }
             tampil(req, resp, "password", "");
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
             throw new ServletException(e);
         }
     }

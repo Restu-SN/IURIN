@@ -4,7 +4,7 @@ import com.iurin.model.PembayaranDao;
 import com.iurin.model.StatusIuran;
 import com.iurin.util.Format;
 import java.io.IOException;
-import java.sql.SQLException;
+import org.hibernate.HibernateException;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -32,7 +32,7 @@ public class StatusServlet extends BaseServlet {
             req.setAttribute("jumlahLunas", lunas);
             req.setAttribute("jumlahBelum", daftar.size() - lunas);
             tampil(req, resp, "status", "status");
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
             throw new ServletException(e);
         }
     }
