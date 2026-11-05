@@ -9,7 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="<?= base_url('assets/iurin.css?v=' . config('Iurin')->versiAset) ?>" rel="stylesheet">
+    <?php /* CSS ditanam langsung supaya tidak tertahan sistem keamanan hosting gratis */ ?>
+    <style><?= file_get_contents(FCPATH . 'assets/iurin.css') ?></style>
 </head>
 <body class="auth-body">
 <div class="auth">
