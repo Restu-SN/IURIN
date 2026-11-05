@@ -11,7 +11,7 @@ Dibuat dengan **PHP 8.2+**, **CodeIgniter 4** (MVC), **Doctrine ORM**, **MySQL**
 
 - Login dengan dua jenis akun:
   - **admin** — boleh menambah, mengubah, dan menghapus data
-  - **anggota** — hanya bisa melihat
+  - **user** (role anggota) — hanya bisa melihat
 - Kelola anggota: tambah, lihat, cari, edit, hapus
 - Catat pembayaran iuran per minggu (pembayaran ganda di minggu yang sama ditolak)
 - Status iuran per minggu: Lunas / Belum bayar / Menunggak
@@ -45,4 +45,4 @@ iurin/
 4. Salin file `env` menjadi `.env`, lalu isi `app.baseURL` dan `database.default.*`.
 5. Buka `http://localhost/iurin`.
 
-Akun awal: **admin** / `admin123` dan **anggota** / `pusing2026` — segera ganti lewat menu **Ganti password**.
+Akun awal: **admin** / `admin123` (admin) dan **user** / `pusing26` (hanya lihat) — segera ganti lewat menu **Ganti password**.

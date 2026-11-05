@@ -36,8 +36,8 @@ CREATE TABLE pengeluaran (
 );
 
 INSERT INTO pengguna (username, password_hash, nama, role) VALUES
-('admin',   '65536:glcm/l74HPil3fYt+H3Oqg==:2AbNTdXvB8iBxUNETwzg6xgAH0M5m7yO450cdg/FJA4=', 'Bendahara', 'admin'),
-('anggota', '65536:jZxS8XO6byO2DYaaJB+wgQ==:/X0EeMjt3owVCpiP1Da/dx2nBcAxMniYPc6G+eFckmM=', 'Anggota PB Orang Pusing', 'anggota');
+('admin', '65536:glcm/l74HPil3fYt+H3Oqg==:2AbNTdXvB8iBxUNETwzg6xgAH0M5m7yO450cdg/FJA4=', 'admin', 'admin'),
+('user',  '65536:li46sO0g4M3XiP9RtF9Vkw==:OniywFLMcZxb1cgz0rFYi+8dZOQ18dqKr0Zx22yKu+E=', 'user', 'anggota');
 
 INSERT INTO anggota (nama, nominal_iuran) VALUES
 ('Etuuu',       15000),
