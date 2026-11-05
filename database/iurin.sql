@@ -1,14 +1,12 @@
--- Database aplikasi Iurin (pencatatan iuran & kas klub)
--- Jalankan lewat phpMyAdmin (tab Import) atau: mysql -u root < iurin.sql
-
 CREATE DATABASE IF NOT EXISTS iurin CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE iurin;
 
-CREATE TABLE admin (
+CREATE TABLE pengguna (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     username      VARCHAR(50)  NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    nama          VARCHAR(100) NOT NULL
+    nama          VARCHAR(100) NOT NULL,
+    role          VARCHAR(10)  NOT NULL DEFAULT 'anggota'
 );
 
 CREATE TABLE anggota (
@@ -37,18 +35,20 @@ CREATE TABLE pengeluaran (
     jumlah     INT          NOT NULL
 );
 
-INSERT INTO admin (username, password_hash, nama) VALUES
-('admin', '65536:glcm/l74HPil3fYt+H3Oqg==:2AbNTdXvB8iBxUNETwzg6xgAH0M5m7yO450cdg/FJA4=', 'Bendahara Klub');
+INSERT INTO pengguna (username, password_hash, nama, role) VALUES
+('admin',   '65536:glcm/l74HPil3fYt+H3Oqg==:2AbNTdXvB8iBxUNETwzg6xgAH0M5m7yO450cdg/FJA4=', 'Bendahara', 'admin'),
+('anggota', '65536:jZxS8XO6byO2DYaaJB+wgQ==:/X0EeMjt3owVCpiP1Da/dx2nBcAxMniYPc6G+eFckmM=', 'Anggota PB Orang Pusing', 'anggota');
 
 INSERT INTO anggota (nama, nominal_iuran) VALUES
-('Etuuu',      15000),
-('Mas Moko',   15000),
-('Mas Dela',   15000),
-('Bang Botak', 15000),
-('Cang Aldi',  15000),
-('Pito',       15000),
-('Bang Yuspi', 15000),
-('Bang Ucup',  15000),
-('Bang Awan',  15000),
-('Om Zirin',   15000),
-('Bang Agil',  15000);
+('Etuuu',       15000),
+('Mas Moko',    15000),
+('Mas Dela',    15000),
+('Bang Botak',  15000),
+('Cang Aldi',   15000),
+('Pito',        15000),
+('Bang Yuspi',  15000),
+('Bang Ucup',   15000),
+('Bang Awan',   15000),
+('Om Zirin',    15000),
+('Bang Agil',   15000),
+('Bang Gilang', 15000);

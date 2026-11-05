@@ -3,47 +3,46 @@
 Aplikasi web untuk mencatat iuran mingguan anggota klub badminton **PB Orang Pusing**:
 siapa yang sudah bayar, siapa yang belum/menunggak, dan rekap kas klub.
 
-Dibuat dengan **Java (JSP + Servlet)**, **Hibernate (ORM)**, **Maven**, **MySQL**, dan **Bootstrap 5**, dijalankan di **Apache Tomcat** melalui **NetBeans**.
+Dibuat dengan **PHP 8.2+**, **CodeIgniter 4** (MVC), **Doctrine ORM**, **MySQL**, dan **Bootstrap 5**.
+
+> Versi sebelumnya (Java Servlet/JSP + Hibernate) disimpan di branch [`java`](../../tree/java).
 
 ## Fitur
 
-- Login bendahara (password disimpan sebagai hash PBKDF2)
+- Login dengan dua jenis akun:
+  - **admin** — boleh menambah, mengubah, dan menghapus data
+  - **anggota** — hanya bisa melihat
 - Kelola anggota: tambah, lihat, cari, edit, hapus
 - Catat pembayaran iuran per minggu (pembayaran ganda di minggu yang sama ditolak)
 - Status iuran per minggu: Lunas / Belum bayar / Menunggak
 - Rekap kas: pemasukan, pengeluaran, dan saldo
+- Password disimpan sebagai hash PBKDF2, form dilindungi CSRF
 - Tampilan responsif (laptop & HP)
 
 ## Struktur Project (MVC)
 
 ```
 iurin/
-├── database/
-│   └── iurin.sql                  ← script membuat database + data anggota
-├── pom.xml                        ← konfigurasi Maven
-└── src/main/
-    ├── java/com/iurin/
-    │   ├── model/                 ← MODEL: entity Hibernate & DAO (HQL)
-    │   │   ├── Anggota.java, Pembayaran.java, Pengeluaran.java, ...
-    │   │   └── AnggotaDao.java, PembayaranDao.java, KasDao.java, AdminDao.java
-    │   ├── controller/            ← CONTROLLER: Servlet yang menerima request
-    │   │   └── AnggotaServlet.java, PembayaranServlet.java, StatusServlet.java, ...
-    │   └── util/                  ← HibernateUtil, hash password, format rupiah
-    ├── resources/hibernate.cfg.xml ← konfigurasi Hibernate & koneksi MySQL
-    └── webapp/
-        ├── WEB-INF/views/         ← VIEW: halaman JSP
-        ├── WEB-INF/web.xml        ← nama klub & konfigurasi aplikasi
-        └── assets/                ← CSS dan foto latar login
+├── app/
+│   ├── Entities/       ← entity Doctrine (Anggota, Pembayaran, Pengeluaran, Pengguna)
+│   ├── Models/         ← MODEL: query DQL lewat EntityManager Doctrine
+│   ├── Controllers/    ← CONTROLLER: Auth, Anggota, Pembayaran, Status, Kas, Password
+│   ├── Views/          ← VIEW: halaman tampilan
+│   ├── Filters/        ← LoginFilter (wajib login), AdminFilter (khusus admin)
+│   ├── Libraries/      ← Doctrine.php (EntityManager), Password.php (hash)
+│   ├── Helpers/        ← format rupiah & minggu
+│   └── Config/         ← Routes.php, Iurin.php (nama klub)
+├── public/             ← index.php, assets/ (CSS, foto login)
+├── database/iurin.sql  ← script database
+└── composer.json       ← CodeIgniter 4, Doctrine ORM
 ```
 
-## Cara Menjalankan
+## Cara Menjalankan (XAMPP)
 
-1. **XAMPP**: Start **MySQL** (Tomcat XAMPP tidak perlu di-Start).
-2. **Database**: buka `http://localhost/phpmyadmin` → tab **Import** → pilih `database/iurin.sql` → **Import**.
-3. **NetBeans**: aktifkan plugin **Java Web and EE**, lalu daftarkan server
-   **Services → Servers → Add Server → Apache Tomcat** dengan lokasi `C:\xampp\tomcat`.
-4. **File → Open Project** → pilih folder `iurin` → klik kanan project → **Run**.
-5. Buka `http://localhost:8080/iurin` dan login dengan username `admin`, password `admin123`
-   (segera ganti lewat menu **Ganti password**).
+1. Taruh folder ini di `C:\xampp\htdocs\iurin`, aktifkan `extension=intl` di `php.ini`, lalu Start **Apache** dan **MySQL**.
+2. Jalankan `composer install` di folder project.
+3. Import `database/iurin.sql` lewat phpMyAdmin.
+4. Salin file `env` menjadi `.env`, lalu isi `app.baseURL` dan `database.default.*`.
+5. Buka `http://localhost/iurin`.
 
-Jika MySQL memakai password, ubah `hibernate.connection.password` di `src/main/resources/hibernate.cfg.xml`.
+Akun awal: **admin** / `admin123` dan **anggota** / `pusing2026` — segera ganti lewat menu **Ganti password**.

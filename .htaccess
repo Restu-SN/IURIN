@@ -1,0 +1,6 @@
+# Arahkan semua request ke folder public/ supaya alamatnya cukup http://localhost/iurin/
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^$ public/ [L]
+    RewriteRule ^((?!public/).*)$ public/$1 [L,NC]
+</IfModule>
