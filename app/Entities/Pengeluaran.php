@@ -9,6 +9,24 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'pengeluaran')]
 class Pengeluaran
 {
+    /** Pilihan cepat saat mencatat pengeluaran hari main. */
+    public const KATEGORI = ['Beli Air', 'Uang Parkir', 'Pembelian Kok', 'Lainnya'];
+
+    /** Pengeluaran yang biasanya dibayar dari kas minggu lalu (kalau ada). */
+    public const DARI_KAS_LALU = ['Beli Air', 'Pembelian Kok'];
+
+    /** Kunci pembanding kategori: tanpa beda huruf besar/kecil & spasi ("beli  air" = "Beli Air"). */
+    public static function kunci(string $kategori): string
+    {
+        return mb_strtolower(preg_replace('/\s+/', ' ', trim($kategori)));
+    }
+
+    /** Termasuk yang diambil dari kas minggu lalu? */
+    public static function dariKasLalu(string $kategori): bool
+    {
+        return in_array(self::kunci($kategori), array_map([self::class, 'kunci'], self::DARI_KAS_LALU), true);
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

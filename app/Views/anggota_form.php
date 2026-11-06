@@ -16,11 +16,11 @@
                    value="<?= esc($anggota?->getNama() ?? '') ?>">
         </div>
         <div class="mb-4">
-            <label class="form-label" for="nominalIuran">Iuran per minggu</label>
+            <label class="form-label" for="nominalIuran">Iuran sekali main</label>
             <div class="input-group">
                 <span class="input-group-text bg-white">Rp</span>
-                <input type="number" id="nominalIuran" name="nominalIuran" class="form-control" min="0" step="500" required
-                       value="<?= $anggota !== null ? $anggota->getNominalIuran() : 15000 ?>">
+                <input type="text" id="nominalIuran" name="nominalIuran" class="form-control input-rupiah" inputmode="numeric" required
+                       value="<?= angka($anggota !== null ? $anggota->getNominalIuran() : 15000) ?>">
             </div>
         </div>
         <div class="d-flex gap-2">

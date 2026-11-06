@@ -5,6 +5,7 @@ namespace App\Libraries;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * Membuat EntityManager Doctrine dari pengaturan database CodeIgniter (.env).
@@ -20,6 +21,9 @@ class Doctrine
                 paths: [APPPATH . 'Entities'],
                 isDevMode: ENVIRONMENT !== 'production',
                 proxyDir: WRITEPATH . 'cache/doctrine',
+                // Cache per request saja: entitasnya sedikit, dan perubahan tabel
+                // langsung terbaca tanpa harus mengosongkan cache di hosting.
+                cache: new ArrayAdapter(),
             );
             $config->setAutoGenerateProxyClasses(true);
 

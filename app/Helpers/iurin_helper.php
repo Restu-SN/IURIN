@@ -1,7 +1,5 @@
 <?php
 
-use CodeIgniter\I18n\Time;
-
 if (! function_exists('rupiah')) {
     function rupiah(int|float $nilai): string
     {
@@ -16,39 +14,59 @@ if (! function_exists('angka')) {
     }
 }
 
-if (! function_exists('minggu_dari')) {
-    /** Kode minggu ISO untuk tanggal tertentu, mis. "2026-W45". */
-    function minggu_dari(DateTimeInterface $tanggal): string
+if (! function_exists('hari_ini')) {
+    function hari_ini(): DateTimeImmutable
     {
-        return $tanggal->format('o-\WW');
+        return new DateTimeImmutable('today', new DateTimeZone('Asia/Jakarta'));
     }
 }
 
-if (! function_exists('minggu_ini')) {
-    function minggu_ini(): string
+if (! function_exists('tanggal_dari')) {
+    /** "2026-11-07" menjadi tanggal; null kalau formatnya salah. */
+    function tanggal_dari(?string $teks): ?DateTimeImmutable
     {
-        return minggu_dari(new DateTimeImmutable('now', new DateTimeZone('Asia/Jakarta')));
+        $tgl = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $teks);
+
+        return $tgl !== false && $tgl->format('Y-m-d') === $teks ? $tgl : null;
     }
 }
 
-if (! function_exists('minggu_valid')) {
-    function minggu_valid(?string $minggu): bool
+if (! function_exists('bulan_valid')) {
+    function bulan_valid(?string $bulan): bool
     {
-        return $minggu !== null && preg_match('/^\d{4}-W\d{2}$/', $minggu) === 1;
+        return $bulan !== null && preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $bulan) === 1;
     }
 }
 
-if (! function_exists('nama_minggu')) {
-    /** "2026-W45" menjadi "Minggu 45 (2 Nov - 8 Nov 2026)". */
-    function nama_minggu(string $minggu): string
+if (! function_exists('rentang_bulan')) {
+    /** "2026-11" menjadi ['2026-11-01', '2026-11-30']. */
+    function rentang_bulan(string $bulan): array
     {
+        $awal = new DateTimeImmutable($bulan . '-01');
+
+        return [$awal->format('Y-m-d'), $awal->modify('last day of this month')->format('Y-m-d')];
+    }
+}
+
+if (! function_exists('nama_bulan')) {
+    /** "2026-11" menjadi "November 2026". */
+    function nama_bulan(string $bulan): string
+    {
+        $nama = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        return $nama[(int) substr($bulan, 5, 2)] . ' ' . substr($bulan, 0, 4);
+    }
+}
+
+if (! function_exists('nama_tanggal')) {
+    /** Tanggal lengkap dengan hari, mis. "Sabtu, 7 Nov 2026". */
+    function nama_tanggal(DateTimeInterface $tanggal): string
+    {
+        $hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         $bulan = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        $awal = (new DateTimeImmutable())->setISODate((int) substr($minggu, 0, 4), (int) substr($minggu, 6));
-        $akhir = $awal->modify('+6 days');
 
-        return 'Minggu ' . (int) substr($minggu, 6)
-            . ' (' . $awal->format('j') . ' ' . $bulan[(int) $awal->format('n')]
-            . ' - ' . $akhir->format('j') . ' ' . $bulan[(int) $akhir->format('n')] . ' ' . $akhir->format('Y') . ')';
+        return $hari[(int) $tanggal->format('w')] . ', ' . $tanggal->format('j') . ' '
+            . $bulan[(int) $tanggal->format('n')] . ' ' . $tanggal->format('Y');
     }
 }
 

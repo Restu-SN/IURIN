@@ -2,11 +2,11 @@
 
 namespace App\Controllers;
 
-use App\Entities\Pengeluaran;
 use App\Models\KasModel;
+use App\Models\PembayaranModel;
 use DateTimeImmutable;
 
-/** Rekap kas klub: pemasukan, pengeluaran, saldo, dan pencatatan pengeluaran. */
+/** Rekap kas klub: pemasukan, pengeluaran, saldo, dan struk per hari main (hanya lihat). */
 class Kas extends BaseController
 {
     public function index()
@@ -26,37 +26,57 @@ class Kas extends BaseController
             'saldo'             => $masuk - $keluar,
             'saldoTotal'        => $kas->totalPemasukan() - $kas->totalPengeluaran(),
             'transaksi'         => $kas->transaksi($bulan),
-            'daftarPengeluaran' => $kas->daftarPengeluaran($bulan),
-            'hariIni'           => date('Y-m-d'),
+            'hariMain'          => (new PembayaranModel())->sesiBulan($bulan),
         ], 'kas');
     }
 
-    public function simpan()
+    /** Struk satu hari main: siapa yang bayar, pengeluaran, sisa, dan total kas. */
+    public function struk(string $tgl = '')
     {
-        $tanggal = DateTimeImmutable::createFromFormat('!Y-m-d', $this->teksPost('tanggal'));
-        $kategori = $this->teksPost('kategori');
-        $jumlah = $this->angkaPost('jumlah');
+        $tanggal = tanggal_dari($tgl);
+        $hadir = $tanggal ? (new PembayaranModel())->daftarTanggal($tanggal) : [];
+        $kas = new KasModel();
+        $pengeluaran = $tanggal ? $kas->daftarPengeluaranTanggal($tanggal) : [];
+        $kasHari = $tanggal ? $kas->kasHari($tanggal) : null;
+        $kasLalu = $kasHari?->getKasLalu() ?? 0;
+        $guest = $kasHari?->getGuest() ?? 0;
+        if ($hadir === [] && $pengeluaran === [] && $kasHari === null) {
+            $this->flash('Belum ada catatan main di tanggal itu.', 'warning');
 
-        if ($tanggal === false || $kategori === '' || $jumlah <= 0) {
-            $this->flash('Lengkapi tanggal, kategori, dan nominal pengeluaran.', 'danger');
-        } else {
-            $p = new Pengeluaran();
-            $p->setTanggal($tanggal);
-            $p->setKategori($kategori);
-            $p->setKeterangan($this->teksPost('keterangan') ?: null);
-            $p->setJumlah($jumlah);
-            (new KasModel())->tambahPengeluaran($p);
-            $this->flash("Pengeluaran {$kategori} tersimpan.");
+            return redirect()->to('kas');
         }
+        $masuk = array_sum(array_map(static fn ($p) => $p->getJumlah(), $hadir)) + ($kasHari?->getMasukGuest() ?? 0);
+        $keluar = array_sum(array_map(static fn ($p) => $p->getJumlah(), $pengeluaran));
+        [$dariKas, $keluarHari] = KasModel::pisahKasLalu($pengeluaran, $kasLalu);
 
-        return redirect()->to('kas?bulan=' . $this->teksPost('filterBulan'));
+        return $this->tampil('kas_struk', [
+            'tanggal'     => $tanggal,
+            'nomor'       => 'IUR-' . $tanggal->format('Ymd'),
+            'dicetak'     => (new DateTimeImmutable('now', new \DateTimeZone('Asia/Jakarta')))->format('H:i'),
+            'hadir'       => $hadir,
+            'pengeluaran' => $pengeluaran,
+            'masuk'       => $masuk,
+            'keluar'      => $keluar,
+            'kasLalu'     => $kasLalu,
+            'dariKas'     => $dariKas,
+            'keluarKas'   => array_sum(array_map(static fn ($p) => $p->getJumlah(), $dariKas)),
+            'keluarHari'  => array_sum(array_map(static fn ($p) => $p->getJumlah(), $keluarHari)),
+            'pengeluaranHari' => $keluarHari,
+            'guest'        => $guest,
+            'tarifGuest'   => $kasHari?->getTarifGuest() ?? 0,
+        ], 'kas');
     }
 
-    public function hapus(int $id)
+    /** Hapus struk = hapus semua catatan tanggal itu (yang main, guest, pengeluaran, kas minggu lalu). */
+    public function hapusStruk(string $tgl = '')
     {
-        (new KasModel())->hapusPengeluaran($id);
-        $this->flash('Pengeluaran dihapus.');
+        $tanggal = tanggal_dari($tgl);
+        if ($tanggal === null) {
+            return redirect()->to('kas');
+        }
+        (new KasModel())->hapusHari($tanggal);
+        $this->flash('Struk ' . nama_tanggal($tanggal) . ' beserta catatannya sudah dihapus.');
 
-        return redirect()->to('kas?bulan=' . $this->teksPost('filterBulan'));
+        return redirect()->to('kas?bulan=' . $tanggal->format('Y-m'));
     }
 }

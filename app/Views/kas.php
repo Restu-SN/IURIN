@@ -36,8 +36,39 @@
     </div>
 </div>
 
+<div class="panel mb-4">
+    <div class="panel-head"><h2>Struk hari main</h2><span class="subtle"><?= count($hariMain) ?> hari</span></div>
+    <div class="table-responsive">
+        <table class="tbl">
+            <tbody>
+            <?php foreach ($hariMain as $s): ?>
+                <tr>
+                    <td>
+                        <span class="fw-semibold text-nowrap"><?= esc(nama_tanggal($s['tanggal'])) ?></span>
+                        <div class="subtle" style="font-size:12.5px"><?= count($s['hadir']) + $s['guest'] ?> orang main &middot; sisa <?= rupiah($s['masuk'] - $s['keluar']) ?></div>
+                    </td>
+                    <td class="num text-nowrap">
+                        <a href="<?= site_url('kas/struk/' . tanggal($s['tanggal'])) ?>" class="btn btn-line btn-sm text-nowrap"><i class="bi bi-receipt me-1"></i> Struk</a>
+                        <?php if ($isAdmin): ?>
+                            <form method="post" action="<?= site_url('kas/struk/hapus/' . tanggal($s['tanggal'])) ?>" class="d-inline"
+                                  onsubmit="return confirm('Hapus struk <?= esc(nama_tanggal($s['tanggal']), 'js') ?>?\n\nSemua catatan tanggal ini (yang main, guest, pengeluaran, kas minggu lalu) ikut terhapus dan tidak bisa dikembalikan.');">
+                                <?= csrf_field() ?>
+                                <button class="btn btn-line btn-sm btn-icon danger" title="Hapus struk"><i class="bi bi-trash3"></i></button>
+                            </form>
+                        <?php endif ?>
+                    </td>
+                </tr>
+            <?php endforeach ?>
+            <?php if (empty($hariMain)): ?>
+                <tr><td colspan="2" class="empty">Belum ada hari main di periode ini.</td></tr>
+            <?php endif ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <div class="row g-4">
-    <div class="<?= $isAdmin ? 'col-xl-8 order-2 order-xl-1' : 'col-12' ?>">
+    <div class="col-12">
         <div class="panel">
             <div class="panel-head"><h2>Transaksi</h2><span class="subtle"><?= count($transaksi) ?> catatan</span></div>
             <div class="table-responsive">
@@ -72,64 +103,4 @@
         </div>
     </div>
 
-    <?php if ($isAdmin): ?>
-    <div class="col-xl-4 order-1 order-xl-2">
-        <div class="panel">
-            <div class="panel-head"><h2>Catat pengeluaran</h2></div>
-            <form class="panel-body" method="post" action="<?= site_url('kas') ?>">
-                <?= csrf_field() ?>
-                <input type="hidden" name="filterBulan" value="<?= esc($bulan) ?>">
-                <div class="mb-3">
-                    <label class="form-label" for="tanggal">Tanggal</label>
-                    <input type="date" id="tanggal" name="tanggal" class="form-control" value="<?= $hariIni ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="kategori">Kategori</label>
-                    <input type="text" id="kategori" name="kategori" class="form-control" list="kategoriList" required maxlength="50"
-                           placeholder="Sewa Lapangan">
-                    <datalist id="kategoriList">
-                        <option value="Sewa Lapangan"><option value="Pembelian Kok"><option value="Konsumsi"><option value="Lainnya">
-                    </datalist>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="ket">Keterangan</label>
-                    <input type="text" id="ket" name="keterangan" class="form-control" maxlength="255">
-                </div>
-                <div class="mb-4">
-                    <label class="form-label" for="jml">Nominal</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-white">Rp</span>
-                        <input type="number" id="jml" name="jumlah" class="form-control" min="1" required>
-                    </div>
-                </div>
-                <button class="btn btn-ink w-100">Simpan Pengeluaran</button>
-            </form>
-        </div>
-
-        <?php if (! empty($daftarPengeluaran)): ?>
-            <div class="panel mt-4">
-                <div class="panel-head"><h2>Daftar pengeluaran</h2></div>
-                <table class="tbl">
-                    <tbody>
-                    <?php foreach ($daftarPengeluaran as $p): ?>
-                        <tr>
-                            <td>
-                                <?= esc($p->getKategori()) ?>
-                                <div class="subtle" style="font-size:12.5px"><?= tanggal($p->getTanggal()) ?> &middot; <?= rupiah($p->getJumlah()) ?></div>
-                            </td>
-                            <td class="num">
-                                <form method="post" action="<?= site_url('kas/hapus/' . $p->getId()) ?>" onsubmit="return confirm('Hapus pengeluaran ini?');">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="filterBulan" value="<?= esc($bulan) ?>">
-                                    <button class="btn btn-line btn-icon danger" title="Hapus"><i class="bi bi-trash3"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif ?>
-    </div>
-    <?php endif ?>
 </div>

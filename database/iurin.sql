@@ -15,14 +15,14 @@ CREATE TABLE anggota (
     nominal_iuran INT          NOT NULL DEFAULT 0
 );
 
+-- Satu baris = satu anggota yang datang main pada satu tanggal
 CREATE TABLE pembayaran (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     anggota_id    INT         NOT NULL,
-    minggu        CHAR(8)     NOT NULL,
     jumlah        INT         NOT NULL,
     tanggal_bayar DATE        NOT NULL,
     keterangan    VARCHAR(255),
-    UNIQUE KEY uk_anggota_minggu (anggota_id, minggu),
+    UNIQUE KEY uk_anggota_tanggal (anggota_id, tanggal_bayar),
     CONSTRAINT fk_pembayaran_anggota FOREIGN KEY (anggota_id)
         REFERENCES anggota (id) ON DELETE CASCADE
 );
@@ -33,6 +33,16 @@ CREATE TABLE pengeluaran (
     kategori   VARCHAR(50)  NOT NULL,
     keterangan VARCHAR(255),
     jumlah     INT          NOT NULL
+);
+
+-- Kas minggu lalu (uang bawaan) & guest tanpa nama per tanggal main
+CREATE TABLE kas_hari (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    tanggal    DATE         NOT NULL,
+    kas_minggu_lalu INT     NOT NULL DEFAULT 0,
+    guest       INT          NOT NULL DEFAULT 0,
+    tarif_guest INT          NOT NULL DEFAULT 15000,
+    UNIQUE KEY uk_kas_hari_tanggal (tanggal)
 );
 
 INSERT INTO pengguna (username, password_hash, nama, role) VALUES

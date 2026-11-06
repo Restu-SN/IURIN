@@ -25,7 +25,7 @@
     <div class="mast-inner">
         <a class="wordmark" href="<?= site_url('anggota') ?>">
             <b>IURIN</b>
-            <small><?= esc($klub) ?><br>Kas &amp; iuran mingguan</small>
+            <small><?= esc($klub) ?><br>Kas &amp; iuran main</small>
         </a>
         <div class="mast-user dropdown">
             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-label="Akun">
@@ -42,8 +42,8 @@
     </div>
     <nav class="tabs" aria-label="Menu utama">
         <a class="<?= $menu === 'anggota' ? 'active' : '' ?>" href="<?= site_url('anggota') ?>"><b>01</b>Anggota</a>
-        <a class="<?= $menu === 'pembayaran' ? 'active' : '' ?>" href="<?= site_url('pembayaran') ?>"><b>02</b>Pembayaran</a>
-        <a class="<?= $menu === 'status' ? 'active' : '' ?>" href="<?= site_url('status') ?>"><b>03</b>Status</a>
+        <a class="<?= $menu === 'pembayaran' ? 'active' : '' ?>" href="<?= site_url('pembayaran') ?>"><b>02</b>Catat Main</a>
+        <a class="<?= $menu === 'status' ? 'active' : '' ?>" href="<?= site_url('status') ?>"><b>03</b>Riwayat</a>
         <a class="<?= $menu === 'kas' ? 'active' : '' ?>" href="<?= site_url('kas') ?>"><b>04</b>Rekap Kas</a>
     </nav>
 </header>

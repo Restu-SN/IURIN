@@ -7,7 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'pembayaran')]
-#[ORM\UniqueConstraint(name: 'uk_anggota_minggu', columns: ['anggota_id', 'minggu'])]
+#[ORM\UniqueConstraint(name: 'uk_anggota_tanggal', columns: ['anggota_id', 'tanggal_bayar'])]
+/** Satu anggota yang datang main pada satu tanggal = satu pembayaran. */
 class Pembayaran
 {
     #[ORM\Id]
@@ -18,10 +19,6 @@ class Pembayaran
     #[ORM\ManyToOne(targetEntity: Anggota::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(name: 'anggota_id', nullable: false, onDelete: 'CASCADE')]
     private Anggota $anggota;
-
-    /** Format ISO "YYYY-Www", mis. 2026-W45. */
-    #[ORM\Column(length: 8, options: ['fixed' => true])]
-    private string $minggu;
 
     #[ORM\Column(type: 'integer')]
     private int $jumlah;
@@ -36,9 +33,6 @@ class Pembayaran
 
     public function getAnggota(): Anggota { return $this->anggota; }
     public function setAnggota(Anggota $anggota): void { $this->anggota = $anggota; }
-
-    public function getMinggu(): string { return $this->minggu; }
-    public function setMinggu(string $minggu): void { $this->minggu = $minggu; }
 
     public function getJumlah(): int { return $this->jumlah; }
     public function setJumlah(int $jumlah): void { $this->jumlah = $jumlah; }

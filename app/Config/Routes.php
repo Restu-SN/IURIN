@@ -16,6 +16,7 @@ $routes->group('', ['filter' => 'login'], static function (RouteCollection $rout
     $routes->get('pembayaran', 'Pembayaran::index');
     $routes->get('status', 'Status::index');
     $routes->get('kas', 'Kas::index');
+    $routes->get('kas/struk/(:segment)', 'Kas::struk/$1');
     $routes->get('password', 'Password::index');
     $routes->post('password', 'Password::simpan');
 
@@ -26,8 +27,8 @@ $routes->group('', ['filter' => 'login'], static function (RouteCollection $rout
         $routes->post('anggota/simpan', 'Anggota::simpan');
         $routes->post('anggota/hapus/(:num)', 'Anggota::hapus/$1');
         $routes->post('pembayaran', 'Pembayaran::simpan');
-        $routes->post('pembayaran/hapus/(:num)', 'Pembayaran::hapus/$1');
-        $routes->post('kas', 'Kas::simpan');
-        $routes->post('kas/hapus/(:num)', 'Kas::hapus/$1');
+        $routes->post('pembayaran/pengeluaran', 'Pembayaran::pengeluaran');
+        $routes->post('pembayaran/kas-lalu', 'Pembayaran::kasLalu');
+        $routes->post('kas/struk/hapus/(:segment)', 'Kas::hapusStruk/$1');
     });
 });

@@ -13,15 +13,12 @@ class Anggota extends BaseController
     public function index()
     {
         $q = trim((string) $this->request->getGet('q'));
-        $status = [];
-        foreach ((new PembayaranModel())->statusMinggu(minggu_ini()) as $s) {
-            $status[$s['anggota']->getId()] = $s['status'];
-        }
+        $rekap = (new PembayaranModel())->rekapAnggota(hari_ini()->format('Y-m'));
 
         return $this->tampil('anggota_list', [
             'q'      => $q,
             'daftar' => (new AnggotaModel())->cari($q),
-            'status' => $status,
+            'rekap'  => $rekap,
         ], 'anggota');
     }
 
@@ -64,7 +61,7 @@ class Anggota extends BaseController
     public function hapus(int $id)
     {
         (new AnggotaModel())->hapus($id);
-        $this->flash('Anggota beserta riwayat iurannya telah dihapus.');
+        $this->flash('Anggota beserta riwayat mainnya telah dihapus.');
 
         return redirect()->to('anggota');
     }
