@@ -24,13 +24,15 @@
     <div class="struk-baris"><span>Hari</span><span><?= esc(explode(',', nama_tanggal($tanggal))[0]) ?></span></div>
 
     <div class="struk-judul">Yang Main (<?= count($hadir) + $guest ?> orang)</div>
-    <?php foreach ($hadir as $p): ?>
-        <div class="struk-item"><?= esc($p->getAnggota()->getNama()) ?></div>
-        <div class="struk-baris"><span>1 x <?= angka($p->getJumlah()) ?></span><span><?= angka($p->getJumlah()) ?></span></div>
+    <?php // Satu baris per orang supaya struk tidak kepanjangan ?>
+    <?php foreach ($hadir as $p): $potong = $p->getPotongTalangan(); ?>
+        <div class="struk-baris">
+            <span><?= esc($p->getAnggota()->getNama()) ?><?php if ($potong > 0): ?> <small>(talangan<?= $p->getJumlah() > 0 ? ' -' . angka($potong) : '' ?>)</small><?php endif ?></span>
+            <span><?= angka($p->getJumlah()) ?></span>
+        </div>
     <?php endforeach ?>
     <?php if ($guest > 0): ?>
-        <div class="struk-item">Guest</div>
-        <div class="struk-baris"><span><?= $guest ?> x <?= angka($tarifGuest) ?></span><span><?= angka($guest * $tarifGuest) ?></span></div>
+        <div class="struk-baris"><span>Guest <small><?= $guest ?> x <?= angka($tarifGuest) ?></small></span><span><?= angka($guest * $tarifGuest) ?></span></div>
     <?php endif ?>
     <?php if ($hadir === [] && $guest === 0): ?>
         <div class="struk-baris"><span>Tidak ada</span><span>0</span></div>
@@ -64,6 +66,13 @@
         <div class="struk-baris struk-total"><span>Total kas</span><span><?= angka($kasLalu + $masuk - $keluar) ?></span></div>
     <?php else: ?>
         <div class="struk-baris struk-total"><span>Sisa</span><span><?= angka($masuk - $keluar) ?></span></div>
+    <?php endif ?>
+
+    <?php if ($talangan !== []): ?>
+        <div class="struk-judul">Sisa Talangan</div>
+        <?php foreach ($talangan as $n => $sisa): ?>
+            <div class="struk-baris"><span><?= esc($n) ?></span><span><?= $sisa > 0 ? angka($sisa) : 'Lunas' ?></span></div>
+        <?php endforeach ?>
     <?php endif ?>
 
     <div class="struk-tutup">

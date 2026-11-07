@@ -51,6 +51,7 @@ class PembayaranModel
             $sudah[$p->getAnggota()->getId()] = $p;
         }
 
+        $sisaTalangan = (new TalanganModel())->sisa();
         $tambah = 0;
         foreach (array_unique(array_map('intval', $anggotaIds)) as $id) {
             if (isset($sudah[$id])) {
@@ -65,7 +66,12 @@ class PembayaranModel
             $p = new Pembayaran();
             $p->setAnggota($anggota);
             $p->setTanggalBayar($tanggal);
-            $p->setJumlah($anggota->getNominalIuran());
+            // Kalau anggota ini punya talangan, iurannya memotong talangan dulu
+            $iuran = $anggota->getNominalIuran();
+            $potong = min($sisaTalangan[$id] ?? 0, $iuran);
+            $sisaTalangan[$id] = ($sisaTalangan[$id] ?? 0) - $potong;
+            $p->setJumlah($iuran - $potong);
+            $p->setPotongTalangan($potong);
             $em->persist($p);
             $tambah++;
         }

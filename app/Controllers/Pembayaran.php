@@ -6,6 +6,7 @@ use App\Entities\Pengeluaran;
 use App\Models\AnggotaModel;
 use App\Models\KasModel;
 use App\Models\PembayaranModel;
+use App\Models\TalanganModel;
 
 /**
  * Catat Main: centang siapa yang datang pada tanggal main (otomatis bayar
@@ -32,6 +33,7 @@ class Pembayaran extends BaseController
             'keluarKas'     => array_sum(array_map(static fn ($p) => $p->getJumlah(), $dariKas)),
             'guest'          => $guest,
             'tarifGuest'     => $tarifGuest,
+            'sisaTalangan'  => (new TalanganModel())->sisa(),
             'tanggal'       => $tanggal,
             'daftarAnggota' => (new AnggotaModel())->cari(),
             'hadir'         => $hadir,

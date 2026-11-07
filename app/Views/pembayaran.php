@@ -80,7 +80,7 @@ $barisKeluar = static function (int $i, string $k) use ($isi, $ikon): string {
                             <label class="hadir-item">
                                 <input type="checkbox" name="hadir[]" value="<?= $a->getId() ?>" <?= $sudah ? 'checked data-awal="1"' : '' ?>>
                                 <span class="cek"><i class="bi bi-check-lg"></i></span>
-                                <span class="nama"><?= esc($a->getNama()) ?><small><?= rupiah($a->getNominalIuran()) ?></small></span>
+                                <span class="nama"><?= esc($a->getNama()) ?><small><?= rupiah($a->getNominalIuran()) ?><?php if (($sisaTalangan[$a->getId()] ?? 0) > 0): ?> &middot; talangan <?= angka($sisaTalangan[$a->getId()]) ?><?php endif ?></small></span>
                             </label>
                         <?php endforeach ?>
                         <?php if (! empty($daftarAnggota)): ?>
@@ -119,7 +119,7 @@ $barisKeluar = static function (int $i, string $k) use ($isi, $ikon): string {
                                     <?= esc($p->getAnggota()->getNama()) ?>
                                 </div>
                             </td>
-                            <td class="num amount-in"><?= rupiah($p->getJumlah()) ?></td>
+                            <td class="num amount-in"><?= rupiah($p->getJumlah()) ?><?php if ($p->getPotongTalangan() > 0): ?><div class="subtle" style="font-size:11.5px">potong talangan <?= angka($p->getPotongTalangan()) ?></div><?php endif ?></td>
                         </tr>
                     <?php endforeach ?>
                     <?php if ($guest > 0): ?>

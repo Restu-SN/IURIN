@@ -34,6 +34,9 @@
                             <div>
                                 <?= esc($a->getNama()) ?>
                                 <span class="meta"><?= rupiah($a->getNominalIuran()) ?>/main</span>
+                                <?php if (($talangan[$a->getId()] ?? 0) > 0): ?>
+                                    <span class="pill pill-belum mt-1" style="font-size:11px">Talangan <?= rupiah($talangan[$a->getId()]) ?></span>
+                                <?php endif ?>
                             </div>
                         </div>
                     </td>

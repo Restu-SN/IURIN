@@ -26,6 +26,8 @@ $routes->group('', ['filter' => 'login'], static function (RouteCollection $rout
         $routes->get('anggota/edit/(:num)', 'Anggota::form/$1');
         $routes->post('anggota/simpan', 'Anggota::simpan');
         $routes->post('anggota/hapus/(:num)', 'Anggota::hapus/$1');
+        $routes->post('anggota/talangan/(:num)', 'Anggota::tambahTalangan/$1');
+        $routes->post('anggota/talangan/hapus/(:num)', 'Anggota::hapusTalangan/$1');
         $routes->post('pembayaran', 'Pembayaran::simpan');
         $routes->post('pembayaran/pengeluaran', 'Pembayaran::pengeluaran');
         $routes->post('pembayaran/kas-lalu', 'Pembayaran::kasLalu');

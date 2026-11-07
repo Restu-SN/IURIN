@@ -20,6 +20,7 @@ CREATE TABLE pembayaran (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     anggota_id    INT         NOT NULL,
     jumlah        INT         NOT NULL,
+    potong_talangan INT       NOT NULL DEFAULT 0,
     tanggal_bayar DATE        NOT NULL,
     keterangan    VARCHAR(255),
     UNIQUE KEY uk_anggota_tanggal (anggota_id, tanggal_bayar),
@@ -33,6 +34,17 @@ CREATE TABLE pengeluaran (
     kategori   VARCHAR(50)  NOT NULL,
     keterangan VARCHAR(255),
     jumlah     INT          NOT NULL
+);
+
+-- Talangan: uang klub yang dibayari dulu oleh anggota (mis. sewa lapangan)
+CREATE TABLE talangan (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    anggota_id INT          NOT NULL,
+    tanggal    DATE         NOT NULL,
+    jumlah     INT          NOT NULL,
+    keterangan VARCHAR(255),
+    CONSTRAINT fk_talangan_anggota FOREIGN KEY (anggota_id)
+        REFERENCES anggota (id) ON DELETE CASCADE
 );
 
 -- Kas minggu lalu (uang bawaan) & guest tanpa nama per tanggal main

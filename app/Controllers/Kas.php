@@ -3,7 +3,9 @@
 namespace App\Controllers;
 
 use App\Models\KasModel;
+use App\Models\AnggotaModel;
 use App\Models\PembayaranModel;
+use App\Models\TalanganModel;
 use DateTimeImmutable;
 
 /** Rekap kas klub: pemasukan, pengeluaran, saldo, dan struk per hari main (hanya lihat). */
@@ -49,7 +51,20 @@ class Kas extends BaseController
         $keluar = array_sum(array_map(static fn ($p) => $p->getJumlah(), $pengeluaran));
         [$dariKas, $keluarHari] = KasModel::pisahKasLalu($pengeluaran, $kasLalu);
 
+        // Sisa talangan per anggota sampai tanggal struk ini
+        $nama = [];
+        foreach ((new AnggotaModel())->cari() as $a) {
+            $nama[$a->getId()] = $a->getNama();
+        }
+        $talangan = [];
+        foreach ((new TalanganModel())->rincian($tanggal) as $id => $r) {
+            if ($r['total'] > 0 && isset($nama[$id])) {
+                $talangan[$nama[$id]] = $r['sisa'];
+            }
+        }
+
         return $this->tampil('kas_struk', [
+            'talangan'    => $talangan,
             'tanggal'     => $tanggal,
             'nomor'       => 'IUR-' . $tanggal->format('Ymd'),
             'dicetak'     => (new DateTimeImmutable('now', new \DateTimeZone('Asia/Jakarta')))->format('H:i'),

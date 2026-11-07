@@ -241,10 +241,13 @@ class KasModel
     {
         $hasil = [];
         foreach ((new PembayaranModel())->daftar($bulan) as $p) {
+            if ($p->getJumlah() <= 0) {
+                continue; // seluruh iurannya memotong talangan, tidak ada uang masuk
+            }
             $hasil[] = [
                 'tanggal'    => $p->getTanggalBayar(),
                 'pemasukan'  => true,
-                'keterangan' => 'Main ' . $p->getAnggota()->getNama(),
+                'keterangan' => 'Main ' . $p->getAnggota()->getNama() . ($p->getPotongTalangan() > 0 ? ' (sebagian potong talangan)' : ''),
                 'jumlah'     => $p->getJumlah(),
             ];
         }

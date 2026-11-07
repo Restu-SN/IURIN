@@ -20,8 +20,13 @@ class Pembayaran
     #[ORM\JoinColumn(name: 'anggota_id', nullable: false, onDelete: 'CASCADE')]
     private Anggota $anggota;
 
+    /** Uang tunai yang masuk kas (iuran dikurangi potongan talangan). */
     #[ORM\Column(type: 'integer')]
     private int $jumlah;
+
+    /** Bagian iuran yang dipakai untuk memotong talangan anggota ini. */
+    #[ORM\Column(name: 'potong_talangan', type: 'integer')]
+    private int $potongTalangan = 0;
 
     #[ORM\Column(name: 'tanggal_bayar', type: 'date_immutable')]
     private DateTimeImmutable $tanggalBayar;
@@ -36,6 +41,12 @@ class Pembayaran
 
     public function getJumlah(): int { return $this->jumlah; }
     public function setJumlah(int $jumlah): void { $this->jumlah = $jumlah; }
+
+    public function getPotongTalangan(): int { return $this->potongTalangan; }
+    public function setPotongTalangan(int $potong): void { $this->potongTalangan = $potong; }
+
+    /** Iuran sekali main sebelum dipotong talangan. */
+    public function getIuran(): int { return $this->jumlah + $this->potongTalangan; }
 
     public function getTanggalBayar(): DateTimeImmutable { return $this->tanggalBayar; }
     public function setTanggalBayar(DateTimeImmutable $tanggal): void { $this->tanggalBayar = $tanggal; }
