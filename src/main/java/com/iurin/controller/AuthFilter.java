@@ -1,5 +1,6 @@
 package com.iurin.controller;
 
+import com.iurin.model.Pengguna;
 import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -12,7 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/** Semua halaman wajib login, kecuali halaman login dan file CSS. */
+/**
+ * Semua halaman wajib login, kecuali halaman login dan file aset.
+ * Akun anggota hanya boleh melihat: semua POST (kecuali login & ganti password)
+ * dan halaman tambah/edit anggota khusus admin.
+ */
 @WebFilter("/*")
 public class AuthFilter implements Filter {
 
@@ -33,13 +38,27 @@ public class AuthFilter implements Filter {
         req.setCharacterEncoding("UTF-8");
 
         String path = req.getRequestURI().substring(req.getContextPath().length());
-        HttpSession session = req.getSession(false);
-        boolean sudahLogin = session != null && session.getAttribute("admin") != null;
-
-        if (sudahLogin || path.equals("/login") || path.startsWith("/assets/")) {
+        if (path.equals("/login") || path.startsWith("/assets/")) {
             chain.doFilter(request, response);
-        } else {
-            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
         }
+        HttpSession session = req.getSession(false);
+        Pengguna p = session == null ? null : (Pengguna) session.getAttribute("pengguna");
+        if (p == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        String aksi = req.getParameter("aksi");
+        boolean ubahData = req.getMethod().equals("POST") && !path.equals("/password");
+        boolean halamanAdmin = path.equals("/anggota") && ("tambah".equals(aksi) || "edit".equals(aksi));
+        if (!p.isAdmin() && (ubahData || halamanAdmin)) {
+            session.setAttribute("flash", "Akun Anda hanya bisa melihat data.");
+            session.setAttribute("flashTipe", "warning");
+            String asal = req.getHeader("Referer");
+            resp.sendRedirect(asal != null ? asal : req.getContextPath() + "/anggota");
+            return;
+        }
+        chain.doFilter(request, response);
     }
 }

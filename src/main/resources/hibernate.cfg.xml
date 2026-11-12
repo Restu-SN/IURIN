@@ -12,9 +12,11 @@
         <property name="hibernate.hbm2ddl.auto">none</property>
         <property name="hibernate.show_sql">false</property>
 
-        <mapping class="com.iurin.model.Admin"/>
+        <mapping class="com.iurin.model.Pengguna"/>
         <mapping class="com.iurin.model.Anggota"/>
         <mapping class="com.iurin.model.Pembayaran"/>
         <mapping class="com.iurin.model.Pengeluaran"/>
+        <mapping class="com.iurin.model.KasHari"/>
+        <mapping class="com.iurin.model.Talangan"/>
     </session-factory>
 </hibernate-configuration>

@@ -1,19 +1,19 @@
 package com.iurin.controller;
 
-import com.iurin.model.AdminDao;
-import com.iurin.model.Admin;
+import com.iurin.model.Pengguna;
+import com.iurin.model.PenggunaDao;
 import java.io.IOException;
-import org.hibernate.HibernateException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.hibernate.HibernateException;
 
 @WebServlet({"/login", "/logout"})
 public class LoginServlet extends BaseServlet {
 
-    private final AdminDao adminDao = new AdminDao();
+    private final PenggunaDao penggunaDao = new PenggunaDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -31,8 +31,8 @@ public class LoginServlet extends BaseServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            Admin admin = adminDao.login(param(req, "username"), req.getParameter("password"));
-            if (admin == null) {
+            Pengguna p = penggunaDao.login(param(req, "username"), req.getParameter("password"));
+            if (p == null) {
                 req.setAttribute("error", "Username atau password salah.");
                 req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
                 return;
@@ -42,7 +42,7 @@ public class LoginServlet extends BaseServlet {
             if (lama != null) {
                 lama.invalidate();
             }
-            req.getSession(true).setAttribute("admin", admin);
+            req.getSession(true).setAttribute("pengguna", p);
             redirect(req, resp, "/anggota");
         } catch (HibernateException e) {
             throw new ServletException("Gagal terhubung ke database: " + e.getMessage(), e);

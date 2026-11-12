@@ -6,10 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 
+/** Akun login. Role admin boleh mengubah data, role anggota hanya melihat. */
 @Entity
-@Table(name = "admin")
-public class Admin {
+@Table(name = "pengguna")
+public class Pengguna implements Serializable {
+
+    public static final String ADMIN = "admin";
+    public static final String ANGGOTA = "anggota";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +29,9 @@ public class Admin {
     @Column(name = "nama", nullable = false, length = 100)
     private String nama;
 
+    @Column(name = "role", nullable = false, length = 20)
+    private String role = ANGGOTA;
+
     public int getId() { return id; }
 
     public String getUsername() { return username; }
@@ -34,4 +42,9 @@ public class Admin {
 
     public String getNama() { return nama; }
     public void setNama(String nama) { this.nama = nama; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+    public boolean isAdmin() { return ADMIN.equals(role); }
 }

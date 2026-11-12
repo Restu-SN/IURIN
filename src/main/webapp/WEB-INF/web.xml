@@ -12,7 +12,7 @@
     <!-- Naikkan angka ini setiap mengubah iurin.css supaya browser tidak memakai versi lama dari cache -->
     <context-param>
         <param-name>versiAset</param-name>
-        <param-value>7</param-value>
+        <param-value>8</param-value>
     </context-param>
     <session-config>
         <session-timeout>60</session-timeout>

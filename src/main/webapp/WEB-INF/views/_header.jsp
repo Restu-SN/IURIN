@@ -1,8 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<fmt:setLocale value="id_ID"/>
+<%@ taglib prefix="f" uri="/WEB-INF/iurin.tld" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <c:set var="klub" value="${initParam.namaKlub}"/>
 <!DOCTYPE html>
@@ -31,15 +30,16 @@
     <div class="mast-inner">
         <a class="wordmark" href="${ctx}/anggota">
             <b>IURIN</b>
-            <small><c:out value="${klub}"/><br>Kas &amp; iuran mingguan</small>
+            <small><c:out value="${klub}"/><br>Kas &amp; iuran main</small>
         </a>
         <div class="mast-user dropdown">
             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-label="Akun">
                 <i class="bi bi-person-square"></i>
-                <span class="who"><c:out value="${sessionScope.admin.nama}"/></span>
+                <span class="who"><c:out value="${sessionScope.pengguna.nama}"/></span>
                 <i class="bi bi-chevron-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
+                <li><span class="dropdown-item-text small text-secondary">${isAdmin ? 'Admin' : 'Anggota (hanya lihat)'}</span></li>
                 <li><a class="dropdown-item" href="${ctx}/password"><i class="bi bi-key me-2"></i>Ganti password</a></li>
                 <li><a class="dropdown-item" href="${ctx}/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>
@@ -47,8 +47,8 @@
     </div>
     <nav class="tabs" aria-label="Menu utama">
         <a class="${menu == 'anggota' ? 'active' : ''}" href="${ctx}/anggota"><b>01</b>Anggota</a>
-        <a class="${menu == 'pembayaran' ? 'active' : ''}" href="${ctx}/pembayaran"><b>02</b>Pembayaran</a>
-        <a class="${menu == 'status' ? 'active' : ''}" href="${ctx}/status"><b>03</b>Status</a>
+        <a class="${menu == 'pembayaran' ? 'active' : ''}" href="${ctx}/pembayaran"><b>02</b>Catat Main</a>
+        <a class="${menu == 'status' ? 'active' : ''}" href="${ctx}/status"><b>03</b>Riwayat</a>
         <a class="${menu == 'kas' ? 'active' : ''}" href="${ctx}/kas"><b>04</b>Rekap Kas</a>
     </nav>
 </header>

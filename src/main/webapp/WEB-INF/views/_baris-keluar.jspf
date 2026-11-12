@@ -1,0 +1,12 @@
+<%-- Satu baris isian pengeluaran: nama, kolom Rp, dan catatan (khusus Lainnya). Variabel: b --%>
+<div class="keluar-baris">
+    <label class="keluar-nama" for="jml${b.i}"><i class="bi ${b.ikon}"></i> <c:out value="${b.kategori}"/></label>
+    <div class="input-group">
+        <span class="input-group-text bg-white">Rp</span>
+        <input type="text" id="jml${b.i}" name="jumlah_${b.i}" class="form-control input-rupiah" inputmode="numeric" placeholder="0" value="${b.nilai}">
+    </div>
+    <c:if test="${b.pakaiCatatan}">
+        <input type="text" name="keterangan_${b.i}" class="form-control mt-2" maxlength="255" placeholder="Untuk apa? (mis. plester, kok rusak)"
+               value="<c:out value='${b.ket}'/>" aria-label="Catatan pengeluaran lainnya">
+    </c:if>
+</div>

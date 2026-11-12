@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fungsi EL untuk JSP: <%@ taglib prefix="f" uri="/WEB-INF/iurin.tld" %> lalu ${f:rupiah(x)} -->
+<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+        version="2.1">
+    <tlib-version>1.0</tlib-version>
+    <short-name>f</short-name>
+    <uri>/WEB-INF/iurin.tld</uri>
+
+    <function>
+        <name>rupiah</name>
+        <function-class>com.iurin.util.Format</function-class>
+        <function-signature>java.lang.String rupiah(long)</function-signature>
+    </function>
+    <function>
+        <name>angka</name>
+        <function-class>com.iurin.util.Format</function-class>
+        <function-signature>java.lang.String angka(long)</function-signature>
+    </function>
+    <function>
+        <name>namaTanggal</name>
+        <function-class>com.iurin.util.Format</function-class>
+        <function-signature>java.lang.String namaTanggal(java.time.LocalDate)</function-signature>
+    </function>
+    <function>
+        <name>namaHari</name>
+        <function-class>com.iurin.util.Format</function-class>
+        <function-signature>java.lang.String namaHari(java.time.LocalDate)</function-signature>
+    </function>
+    <function>
+        <name>inisial</name>
+        <function-class>com.iurin.util.Format</function-class>
+        <function-signature>java.lang.String inisial(java.lang.String)</function-signature>
+    </function>
+</taglib>

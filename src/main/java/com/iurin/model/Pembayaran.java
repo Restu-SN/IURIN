@@ -9,9 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import java.time.LocalDate;
 
+/** Satu anggota yang datang main pada satu tanggal = satu pembayaran. */
 @Entity
 @Table(name = "pembayaran")
 public class Pembayaran {
@@ -24,12 +24,13 @@ public class Pembayaran {
     @JoinColumn(name = "anggota_id", nullable = false)
     private Anggota anggota;
 
-    /** Format ISO "YYYY-Www", mis. 2026-W45. */
-    @Column(name = "minggu", nullable = false, length = 8)
-    private String minggu;
-
+    /** Uang tunai yang masuk kas (iuran dikurangi potongan talangan). */
     @Column(name = "jumlah", nullable = false)
     private int jumlah;
+
+    /** Bagian iuran yang dipakai untuk memotong talangan anggota ini. */
+    @Column(name = "potong_talangan", nullable = false)
+    private int potongTalangan;
 
     @Column(name = "tanggal_bayar", nullable = false)
     private LocalDate tanggalBayar;
@@ -37,26 +38,19 @@ public class Pembayaran {
     @Column(name = "keterangan")
     private String keterangan;
 
-    /** Id anggota dari form, sebelum objek Anggota dimuat. */
-    @Transient
-    private int anggotaIdInput;
-
     public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
 
     public Anggota getAnggota() { return anggota; }
     public void setAnggota(Anggota anggota) { this.anggota = anggota; }
 
-    public int getAnggotaId() { return anggota != null ? anggota.getId() : anggotaIdInput; }
-    public void setAnggotaId(int anggotaId) { this.anggotaIdInput = anggotaId; }
-
-    public String getNamaAnggota() { return anggota != null ? anggota.getNama() : null; }
-
-    public String getMinggu() { return minggu; }
-    public void setMinggu(String minggu) { this.minggu = minggu; }
-
     public int getJumlah() { return jumlah; }
     public void setJumlah(int jumlah) { this.jumlah = jumlah; }
+
+    public int getPotongTalangan() { return potongTalangan; }
+    public void setPotongTalangan(int potongTalangan) { this.potongTalangan = potongTalangan; }
+
+    /** Iuran sekali main sebelum dipotong talangan. */
+    public int getIuran() { return jumlah + potongTalangan; }
 
     public LocalDate getTanggalBayar() { return tanggalBayar; }
     public void setTanggalBayar(LocalDate tanggalBayar) { this.tanggalBayar = tanggalBayar; }
